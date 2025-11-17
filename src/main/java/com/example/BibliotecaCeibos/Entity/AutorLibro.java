@@ -1,25 +1,29 @@
 package com.example.BibliotecaCeibos.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "AutorLibro")
+@Table(name = "autor_libro")
 @Getter
 @Setter
 public class AutorLibro {
 
-    @EmbeddedId
-    private AutorLibroId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_autor_libro")
+    private Integer idAutorLibro;
+
 
     @ManyToOne
-    @MapsId("idAutor")
-    @JoinColumn(name = "IdAutor")
+    @JoinColumn(name = "id_autor")
+    @JsonIgnoreProperties("autorLibros")
     private Autor autor;
 
     @ManyToOne
-    @MapsId("idLibro")
-    @JoinColumn(name = "IdLibro")
+    @JoinColumn(name = "id_libro")
+    @JsonIgnoreProperties("autorLibros")
     private Libro libro;
 }

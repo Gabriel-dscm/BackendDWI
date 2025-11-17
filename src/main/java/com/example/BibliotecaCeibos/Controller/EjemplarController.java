@@ -30,7 +30,24 @@ public class EjemplarController {
     }
 
     @PutMapping("/{id}")
-    public Ejemplar update(@PathVariable Integer id, @RequestBody Ejemplar ejemplar) {
+    public Ejemplar update(@PathVariable Integer id, @RequestBody Ejemplar ejemplarDetails) {
+        Ejemplar ejemplar = ejemplarRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ejemplar no encontrado con id: " + id));
+
+
+        if (ejemplarDetails.getCodigoInterno() != null) {
+            ejemplar.setCodigoInterno(ejemplarDetails.getCodigoInterno());
+        }
+        if (ejemplarDetails.getEstadoEjemplar() != null) {
+            ejemplar.setEstadoEjemplar(ejemplarDetails.getEstadoEjemplar());
+        }
+        if (ejemplarDetails.getEstado() != null) {
+            ejemplar.setEstado(ejemplarDetails.getEstado());
+        }
+        if (ejemplarDetails.getLibro() != null) {
+            ejemplar.setLibro(ejemplarDetails.getLibro());
+        }
+
         ejemplar.setIdEjemplar(id);
         return ejemplarRepository.save(ejemplar);
     }
