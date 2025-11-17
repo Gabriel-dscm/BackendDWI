@@ -1,5 +1,6 @@
 package com.example.BibliotecaCeibos.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,32 +15,35 @@ public class Libro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IdLibro")
+    @Column(name = "id_libro")
     private Integer idLibro;
 
-    @Column(name = "Titulo")
+    @Column(name = "titulo")
     private String titulo;
 
-    @Column(name = "Editorial")
+    @Column(name = "editorial")
     private String editorial;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "AnioPublicacion")
+    @Column(name = "anio_publicacion")
     private Date anioPublicacion;
 
-    @Column(name = "ISBN")
+    @Column(name = "isbn")
     private String isbn;
 
     @ManyToOne
-    @JoinColumn(name = "IdDewey")
+    @JoinColumn(name = "id_dewey")
     private Dewey dewey;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("libro")
     private List<Ejemplar> ejemplares;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("libro")
     private List<AutorLibro> autorLibros;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("libro")
     private List<LibroPalabraClave> libroPalabraClaves;
 }

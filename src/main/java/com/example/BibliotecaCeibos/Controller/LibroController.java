@@ -16,7 +16,7 @@ public class LibroController {
 
     @GetMapping
     public List<Libro> getAll() {
-        return libroRepository.findAll();
+        return libroRepository.findAllWithDetails();
     }
 
     @GetMapping("/{id}")
