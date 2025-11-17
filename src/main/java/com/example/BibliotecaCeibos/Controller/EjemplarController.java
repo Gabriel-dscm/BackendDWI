@@ -1,10 +1,13 @@
 package com.example.BibliotecaCeibos.Controller;
 
 import com.example.BibliotecaCeibos.Entity.Ejemplar;
+import com.example.BibliotecaCeibos.Entity.Libro; // <-- 1. IMPORTA LIBRO
 import com.example.BibliotecaCeibos.Repository.EjemplarRepository;
+import com.example.BibliotecaCeibos.Repository.LibroRepository; // <-- 2. IMPORTA LIBRO REPO
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map; // <-- 3. IMPORTA MAP
 
 @RestController
 @RequestMapping("/api/ejemplares")
@@ -13,6 +16,9 @@ public class EjemplarController {
 
     @Autowired
     private EjemplarRepository ejemplarRepository;
+
+    @Autowired
+    private LibroRepository libroRepository;
 
     @GetMapping
     public List<Ejemplar> getAll() {
@@ -26,29 +32,38 @@ public class EjemplarController {
 
     @PostMapping
     public Ejemplar create(@RequestBody Ejemplar ejemplar) {
+        ejemplar.setIdEjemplar(null);
         return ejemplarRepository.save(ejemplar);
     }
 
     @PutMapping("/{id}")
-    public Ejemplar update(@PathVariable Integer id, @RequestBody Ejemplar ejemplarDetails) {
+    public Ejemplar update(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
+
         Ejemplar ejemplar = ejemplarRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ejemplar no encontrado con id: " + id));
 
+        if (updates.containsKey("codigoInterno")) {
+            ejemplar.setCodigoInterno((String) updates.get("codigoInterno"));
+        }
+        if (updates.containsKey("estadoEjemplar")) {
+            ejemplar.setEstadoEjemplar((String) updates.get("estadoEjemplar"));
+        }
+        if (updates.containsKey("estado")) {
+            ejemplar.setEstado((String) updates.get("estado"));
+        }
+        if (updates.containsKey("libro")) {
 
-        if (ejemplarDetails.getCodigoInterno() != null) {
-            ejemplar.setCodigoInterno(ejemplarDetails.getCodigoInterno());
-        }
-        if (ejemplarDetails.getEstadoEjemplar() != null) {
-            ejemplar.setEstadoEjemplar(ejemplarDetails.getEstadoEjemplar());
-        }
-        if (ejemplarDetails.getEstado() != null) {
-            ejemplar.setEstado(ejemplarDetails.getEstado());
-        }
-        if (ejemplarDetails.getLibro() != null) {
-            ejemplar.setLibro(ejemplarDetails.getLibro());
+            try {
+                Map<String, Object> libroMap = (Map<String, Object>) updates.get("libro");
+                Integer libroId = (Integer) libroMap.get("idLibro");
+                Libro libro = libroRepository.findById(libroId)
+                        .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + libroId));
+                ejemplar.setLibro(libro);
+            } catch (Exception e) {
+                throw new RuntimeException("Error al procesar el objeto 'libro': " + e.getMessage());
+            }
         }
 
-        ejemplar.setIdEjemplar(id);
         return ejemplarRepository.save(ejemplar);
     }
 

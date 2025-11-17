@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ejemplares/**").hasRole("ADMIN")
                         .requestMatchers("/api/autores/**").hasRole("ADMIN")  
                         .requestMatchers("/api/autorlibro/**").hasRole("ADMIN")
+                        .requestMatchers("/api/dewey/**").hasRole("ADMIN")
 
                         .requestMatchers("/api/biblioteca/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/libros/**").hasAnyRole("USER", "ADMIN")
