@@ -49,6 +49,7 @@ public class EjemplarController {
             ejemplar.setEstadoEjemplar((String) updates.get("estadoEjemplar"));
         }
         if (updates.containsKey("estado")) {
+            // Esto arregla la función "Dar de Baja"
             ejemplar.setEstado((String) updates.get("estado"));
         }
         if (updates.containsKey("libro")) {
