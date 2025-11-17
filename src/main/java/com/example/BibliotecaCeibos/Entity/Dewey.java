@@ -25,6 +25,6 @@ public class Dewey {
 
     @OneToMany(mappedBy = "dewey", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("dewey")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) 
     private List<Libro> libros;
 }
