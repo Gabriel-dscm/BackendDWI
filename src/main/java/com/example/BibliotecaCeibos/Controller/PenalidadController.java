@@ -3,8 +3,12 @@ package com.example.BibliotecaCeibos.Controller;
 import com.example.BibliotecaCeibos.Entity.Penalidad;
 import com.example.BibliotecaCeibos.Repository.PenalidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/penalidades")
@@ -15,8 +19,15 @@ public class PenalidadController {
     private PenalidadRepository penalidadRepository;
 
     @GetMapping
-    public List<Penalidad> getAll() {
-        return penalidadRepository.findAll();
+    public List<Penalidad> getAll(
+            @RequestParam(required = false) String clienteNombre,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha
+    ) {
+        if (clienteNombre == null && estado == null && fecha == null) {
+            return penalidadRepository.findAll();
+        }
+        return penalidadRepository.searchPenalidades(clienteNombre, estado, fecha);
     }
 
     @GetMapping("/{id}")
@@ -24,19 +35,17 @@ public class PenalidadController {
         return penalidadRepository.findById(id).orElse(null);
     }
 
-    @PostMapping
-    public Penalidad create(@RequestBody Penalidad penalidad) {
-        return penalidadRepository.save(penalidad);
-    }
+    @PutMapping("/{idPenalidad}/pagar")
+    public ResponseEntity<?> pagarPenalidad(@PathVariable Integer idPenalidad) {
+        Optional<Penalidad> penalidadOpt = penalidadRepository.findById(idPenalidad);
 
-    @PutMapping("/{id}")
-    public Penalidad update(@PathVariable Integer id, @RequestBody Penalidad penalidad) {
-        penalidad.setIdPenalidad(id);
-        return penalidadRepository.save(penalidad);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        penalidadRepository.deleteById(id);
+        if (penalidadOpt.isPresent()) {
+            Penalidad penalidad = penalidadOpt.get();
+            penalidad.setEstado("Pagada");
+            penalidadRepository.save(penalidad);
+            return ResponseEntity.ok(penalidad);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

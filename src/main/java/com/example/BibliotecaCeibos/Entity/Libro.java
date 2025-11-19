@@ -1,6 +1,7 @@
 package com.example.BibliotecaCeibos.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty; // <-- 1. IMPORTA ESTE
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,13 +38,16 @@ public class Libro {
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) 
     private List<Ejemplar> ejemplares;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<AutorLibro> autorLibros;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<LibroPalabraClave> libroPalabraClaves;
 }

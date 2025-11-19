@@ -27,13 +27,8 @@ public class Prestamo {
     @Column(name = "EstadoLibro")
     private String estadoLibro;
 
-    @ManyToOne
-    @JoinColumn(name = "IdCliente")
-    private Cliente cliente;
-
-    @ManyToOne
-    @JoinColumn(name = "IdEmpleado")
-    private Empleado empleado;
+    @Column(name = "Estado")
+    private String estado;
 
     @ManyToOne
     @JoinColumn(name = "IdReserva")
@@ -42,4 +37,12 @@ public class Prestamo {
     @ManyToOne
     @JoinColumn(name = "IdEjemplar")
     private Ejemplar ejemplar;
+
+    @ManyToOne
+    @JoinColumn(name = "IdCliente")
+    private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "IdEmpleado")
+    private Empleado empleado;
 }
