@@ -1,6 +1,7 @@
 package com.example.BibliotecaCeibos.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty; // <-- 1. IMPORTA ESTE
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,5 +29,6 @@ public class Autor {
 
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("autor")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<AutorLibro> autorLibros;
 }

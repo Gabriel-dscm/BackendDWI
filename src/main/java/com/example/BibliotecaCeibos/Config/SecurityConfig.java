@@ -4,6 +4,7 @@ import com.example.BibliotecaCeibos.Service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // <-- NUEVO IMPORT
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,24 +41,35 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
                 .cors(cors -> {})
-
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/login").permitAll()
 
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/rolesempleados/**").hasRole("ADMIN")
                         .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                         .requestMatchers("/api/ejemplares/**").hasRole("ADMIN")
-                        .requestMatchers("/api/autores/**").hasRole("ADMIN")  
                         .requestMatchers("/api/autorlibro/**").hasRole("ADMIN")
-                        .requestMatchers("/api/dewey/**").hasRole("ADMIN")
+                        .requestMatchers("/api/clientes/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/reservas").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/prestamos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/reporte-completadas").hasRole("ADMIN")
+                        .requestMatchers("/api/prestamos/activos-por-cliente/{clienteId}").hasRole("ADMIN")
+                        .requestMatchers("/api/devoluciones/**").hasRole("ADMIN")
+                        .requestMatchers("/api/penalidades/**").hasRole("ADMIN")
+                        .requestMatchers("/api/reportes/**").hasRole("ADMIN")
+                        .requestMatchers("/api/prestamos/convert-from-reserva").hasRole("ADMIN")
 
                         .requestMatchers("/api/biblioteca/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/libros/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/autores/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/dewey/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/palabraclave/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/solicitudes/**").hasAnyRole("USER", "ADMIN")
+
                         .requestMatchers("/api/reservas/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/prestamos/**").hasAnyRole("USER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )

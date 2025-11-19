@@ -1,7 +1,6 @@
 package com.example.BibliotecaCeibos.Controller;
 
 import com.example.BibliotecaCeibos.Entity.LibroPalabraClave;
-import com.example.BibliotecaCeibos.Entity.LibroPalabraClaveId;
 import com.example.BibliotecaCeibos.Repository.LibroPalabraClaveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,33 +19,30 @@ public class LibroPalabraClaveController {
         return libroPalabraClaveRepository.findAll();
     }
 
-    @GetMapping("/{idLibro}/{idPalabraClave}")
-    public LibroPalabraClave getById(@PathVariable Integer idLibro, @PathVariable Integer idPalabraClave) {
-        LibroPalabraClaveId id = new LibroPalabraClaveId();
-        id.setIdLibro(idLibro);
-        id.setIdPalabraClave(idPalabraClave);
+    @GetMapping("/{id}")
+    public LibroPalabraClave getById(@PathVariable Integer id) {
         return libroPalabraClaveRepository.findById(id).orElse(null);
     }
 
     @PostMapping
     public LibroPalabraClave create(@RequestBody LibroPalabraClave libroPalabraClave) {
+        libroPalabraClave.setIdLibroPalabraClave(null);
         return libroPalabraClaveRepository.save(libroPalabraClave);
     }
 
-    @PutMapping("/{idLibro}/{idPalabraClave}")
-    public LibroPalabraClave update(@PathVariable Integer idLibro, @PathVariable Integer idPalabraClave, @RequestBody LibroPalabraClave libroPalabraClave) {
-        LibroPalabraClaveId id = new LibroPalabraClaveId();
-        id.setIdLibro(idLibro);
-        id.setIdPalabraClave(idPalabraClave);
-        libroPalabraClave.setId(id);
-        return libroPalabraClaveRepository.save(libroPalabraClave);
+    @PutMapping("/{id}")
+    public LibroPalabraClave update(@PathVariable Integer id, @RequestBody LibroPalabraClave details) {
+        LibroPalabraClave lpc = libroPalabraClaveRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Relación no encontrada"));
+
+        lpc.setLibro(details.getLibro());
+        lpc.setPalabraClave(details.getPalabraClave());
+        lpc.setIdLibroPalabraClave(id);
+        return libroPalabraClaveRepository.save(lpc);
     }
 
-    @DeleteMapping("/{idLibro}/{idPalabraClave}")
-    public void delete(@PathVariable Integer idLibro, @PathVariable Integer idPalabraClave) {
-        LibroPalabraClaveId id = new LibroPalabraClaveId();
-        id.setIdLibro(idLibro);
-        id.setIdPalabraClave(idPalabraClave);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
         libroPalabraClaveRepository.deleteById(id);
     }
 }

@@ -24,6 +24,9 @@ public class Reserva {
     @Column(name = "FechaExpiracion")
     private Date fechaExpiracion;
 
+    @Column(name = "Estado")
+    private String estado;
+
     @ManyToOne
     @JoinColumn(name = "IdCliente")
     private Cliente cliente;
