@@ -101,7 +101,11 @@ public class ReservaController {
         Reserva nuevaReserva = new Reserva();
         nuevaReserva.setCliente(cliente);
         nuevaReserva.setEjemplar(ejemplarSeleccionado);
-        nuevaReserva.setFechaReserva(new Date());
+        if (reservaRequest.getFechaReserva() != null) {
+            nuevaReserva.setFechaReserva(reservaRequest.getFechaReserva());
+        } else {
+            nuevaReserva.setFechaReserva(new Date());
+        }
         nuevaReserva.setFechaExpiracion(reservaRequest.getFechaExpiracion());
 
         return reservaRepository.save(nuevaReserva);
