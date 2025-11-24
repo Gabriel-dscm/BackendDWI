@@ -16,23 +16,11 @@ public interface LibroRepository extends JpaRepository<Libro,Integer>{
             "LEFT JOIN FETCH l.autorLibros al LEFT JOIN FETCH al.autor a " +
             "LEFT JOIN l.libroPalabraClaves lpc LEFT JOIN lpc.palabraClave pc " +
             "LEFT JOIN l.ejemplares e " +
-            "WHERE " +
-            "(COALESCE(:autor, '') = 'UNIVERSAL_SEARCH_FLAG' AND (" +
-            "  l.titulo LIKE %:titulo% OR " +
-            "  pc.descripcion LIKE %:titulo% OR " +
-            "  a.nombres LIKE %:titulo% OR " +
-            "  a.apellidos LIKE %:titulo% OR " +
-            "  d.categoria LIKE %:titulo% OR " +
-            "  d.descripcion LIKE %:titulo%" +
-            ")) " +
-            "OR " +
-            "(COALESCE(:autor, '') != 'UNIVERSAL_SEARCH_FLAG' AND (" +
-            "  (:titulo IS NULL OR l.titulo LIKE %:titulo% OR pc.descripcion LIKE %:titulo%) AND " +
-            "  (:autor IS NULL OR a.nombres LIKE %:autor% OR a.apellidos LIKE %:autor%) AND " +
-            "  (:deweyId IS NULL OR d.idDewey = :deweyId) AND " +
-            "  (:editorial IS NULL OR l.editorial LIKE %:editorial%) AND " +
-            "  (:estado IS NULL OR e.estado = :estado)" +
-            "))")
+            "WHERE (:titulo IS NULL OR l.titulo LIKE %:titulo%) " +
+            "AND (:autor IS NULL OR a.nombres LIKE %:autor% OR a.apellidos LIKE %:autor%) " +
+            "AND (:deweyId IS NULL OR d.idDewey = :deweyId) " +
+            "AND (:editorial IS NULL OR l.editorial LIKE %:editorial%) " +
+            "AND (:estado IS NULL OR e.estado = :estado)")
     List<Libro> searchLibros(
             @Param("titulo") String titulo,
             @Param("autor") String autor,
