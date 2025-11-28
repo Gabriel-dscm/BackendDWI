@@ -42,21 +42,19 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // Verifica si el token ha expirado
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // Genera un token para un UserDetails
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String nombreCompleto) {
         Map<String, Object> claims = new HashMap<>();
         var roles = userDetails.getAuthorities();
         claims.put("roles", roles);
+        claims.put("nombreCompleto", nombreCompleto);
 
         return createToken(claims, userDetails.getUsername());
     }
 
-    // Crea el token
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)

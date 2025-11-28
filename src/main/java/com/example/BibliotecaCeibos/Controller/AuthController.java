@@ -1,6 +1,10 @@
 package com.example.BibliotecaCeibos.Controller;
 
 import com.example.BibliotecaCeibos.Config.JwtUtil;
+import com.example.BibliotecaCeibos.Entity.Cliente;
+import com.example.BibliotecaCeibos.Entity.Empleado;
+import com.example.BibliotecaCeibos.Repository.ClienteRepository;
+import com.example.BibliotecaCeibos.Repository.EmpleadoRepository;
 import com.example.BibliotecaCeibos.Service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional; // Importante
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin("*") // Permite peticiones de Angular
+@CrossOrigin("*")
 public class AuthController {
 
     @Autowired
@@ -26,6 +31,11 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
 
     @PostMapping("/login")
     public Map<String, Object> createAuthenticationToken(@RequestBody Map<String, String> body) throws Exception {
@@ -42,7 +52,21 @@ public class AuthController {
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        final String jwt = jwtUtil.generateToken(userDetails);
+        String nombreCompleto = "";
+
+        Optional<Cliente> clienteOpt = clienteRepository.findByEmail(username);
+        if (clienteOpt.isPresent()) {
+            Cliente c = clienteOpt.get();
+            nombreCompleto = c.getNombres() + " " + c.getApellidoPaterno() + " " + c.getApellidoMaterno();
+        } else {
+            Optional<Empleado> empleadoOpt = empleadoRepository.findByEmail(username);
+            if (empleadoOpt.isPresent()) {
+                Empleado e = empleadoOpt.get();
+                nombreCompleto = e.getNombres() + " " + e.getApellidoPaterno() + " " + e.getApellidoMaterno();
+            }
+        }
+
+        final String jwt = jwtUtil.generateToken(userDetails, nombreCompleto);
 
         String role = userDetails.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())

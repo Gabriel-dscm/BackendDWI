@@ -4,11 +4,12 @@ import com.example.BibliotecaCeibos.Entity.Penalidad;
 import com.example.BibliotecaCeibos.Repository.PenalidadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/penalidades")
@@ -35,17 +36,16 @@ public class PenalidadController {
         return penalidadRepository.findById(id).orElse(null);
     }
 
-    @PutMapping("/{idPenalidad}/pagar")
-    public ResponseEntity<?> pagarPenalidad(@PathVariable Integer idPenalidad) {
-        Optional<Penalidad> penalidadOpt = penalidadRepository.findById(idPenalidad);
-
-        if (penalidadOpt.isPresent()) {
-            Penalidad penalidad = penalidadOpt.get();
+    @PutMapping("/{id}/pagar")
+    public Penalidad resolverPenalidad(@PathVariable Integer id) {
+        Penalidad penalidad = penalidadRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Penalidad no encontrada"));
+        if ("Monetaria".equalsIgnoreCase(penalidad.getTipo())) {
             penalidad.setEstado("Pagada");
-            penalidadRepository.save(penalidad);
-            return ResponseEntity.ok(penalidad);
         } else {
-            return ResponseEntity.notFound().build();
+            penalidad.setEstado("Concluida");
         }
+
+        return penalidadRepository.save(penalidad);
     }
 }

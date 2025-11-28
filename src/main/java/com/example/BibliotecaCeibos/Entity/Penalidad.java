@@ -3,7 +3,7 @@ package com.example.BibliotecaCeibos.Entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Date; // NUEVO
+import java.util.Date;
 
 @Entity
 @Table(name = "Penalidad")
@@ -18,6 +18,9 @@ public class Penalidad {
 
     @Column(name = "Motivo")
     private String motivo;
+
+    @Column(name = "Tipo")
+    private String tipo;
 
     @Column(name = "Monto")
     private Double monto;
