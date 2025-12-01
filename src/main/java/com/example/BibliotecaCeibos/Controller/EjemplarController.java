@@ -1,13 +1,13 @@
 package com.example.BibliotecaCeibos.Controller;
 
 import com.example.BibliotecaCeibos.Entity.Ejemplar;
-import com.example.BibliotecaCeibos.Entity.Libro; // <-- 1. IMPORTA LIBRO
+import com.example.BibliotecaCeibos.Entity.Libro;
 import com.example.BibliotecaCeibos.Repository.EjemplarRepository;
-import com.example.BibliotecaCeibos.Repository.LibroRepository; // <-- 2. IMPORTA LIBRO REPO
+import com.example.BibliotecaCeibos.Repository.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map; // <-- 3. IMPORTA MAP
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ejemplares")
@@ -22,6 +22,7 @@ public class EjemplarController {
 
     @GetMapping
     public List<Ejemplar> getAll() {
+        // Usa la versión optimizada del Repo
         return ejemplarRepository.findAllWithDetails();
     }
 
@@ -33,6 +34,11 @@ public class EjemplarController {
     @PostMapping
     public Ejemplar create(@RequestBody Ejemplar ejemplar) {
         ejemplar.setIdEjemplar(null);
+        // Al crear, asegurate de que el objeto Libro que viene solo tenga el ID para que no intente guardar cosas raras
+        if(ejemplar.getLibro() != null && ejemplar.getLibro().getIdLibro() != null){
+             // Opcional: Validar que el libro exista si quieres ser estricto, 
+             // pero Hibernate lo maneja si solo mandas el ID.
+        }
         return ejemplarRepository.save(ejemplar);
     }
 
@@ -49,17 +55,21 @@ public class EjemplarController {
             ejemplar.setEstadoEjemplar((String) updates.get("estadoEjemplar"));
         }
         if (updates.containsKey("estado")) {
-            // Esto arregla la función "Dar de Baja"
             ejemplar.setEstado((String) updates.get("estado"));
         }
+        
+        // MEJORA: Solo buscamos el libro si realmente enviaron un cambio de libro
         if (updates.containsKey("libro")) {
-
             try {
                 Map<String, Object> libroMap = (Map<String, Object>) updates.get("libro");
-                Integer libroId = (Integer) libroMap.get("idLibro");
-                Libro libro = libroRepository.findById(libroId)
-                        .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + libroId));
-                ejemplar.setLibro(libro);
+                Integer nuevoLibroId = (Integer) libroMap.get("idLibro");
+
+                // Solo hacemos la consulta si el ID es diferente al que ya tiene
+                if (ejemplar.getLibro() == null || !ejemplar.getLibro().getIdLibro().equals(nuevoLibroId)) {
+                    Libro libro = libroRepository.findById(nuevoLibroId)
+                            .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + nuevoLibroId));
+                    ejemplar.setLibro(libro);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("Error al procesar el objeto 'libro': " + e.getMessage());
             }
