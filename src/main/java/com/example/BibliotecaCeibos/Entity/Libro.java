@@ -1,12 +1,12 @@
 package com.example.BibliotecaCeibos.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty; // <-- 1. IMPORTA ESTE
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Date;
-import java.util.List;
+import java.util.Set; // <--- CAMBIO IMPORTANTE: Usar Set en vez de List
 
 @Entity
 @Table(name = "Libro")
@@ -36,18 +36,21 @@ public class Libro {
     @JoinColumn(name = "id_dewey")
     private Dewey dewey;
 
+    // CAMBIO 1: List -> Set
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY) 
-    private List<Ejemplar> ejemplares;
+    private Set<Ejemplar> ejemplares;
 
+    // CAMBIO 2: List -> Set
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<AutorLibro> autorLibros;
+    private Set<AutorLibro> autorLibros;
 
+    // CAMBIO 3: List -> Set
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("libro")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<LibroPalabraClave> libroPalabraClaves;
+    private Set<LibroPalabraClave> libroPalabraClaves;
 }
