@@ -25,10 +25,11 @@ public class Ejemplar {
     @Column(name = "estado")
     private String estado;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Ayuda a no traerlo si no se necesita
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_libro")
-    // ✅ ESTA ES LA SOLUCIÓN:
-    // Ignoramos TODAS las listas pesadas del libro para que el Update responda al instante.
-    @JsonIgnoreProperties({"ejemplares", "autorLibros", "libroPalabraClaves", "dewey", "hibernateLazyInitializer", "handler"})
+    // ✅ CAMBIO AQUÍ: 
+    // Borré "autorLibros" de la lista de ignorados. 
+    // Mantenemos "ejemplares" y "libroPalabraClaves" ignorados para evitar lentitud.
+    @JsonIgnoreProperties({"ejemplares", "libroPalabraClaves", "dewey", "hibernateLazyInitializer", "handler"})
     private Libro libro;
 }

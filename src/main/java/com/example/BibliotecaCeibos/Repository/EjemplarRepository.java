@@ -11,14 +11,13 @@ import java.util.Optional;
 @Repository
 public interface EjemplarRepository extends JpaRepository<Ejemplar, Integer> {
 
-    // ✅ OPTIMIZACIÓN AGRESIVA:
-    // Traemos el Ejemplar y su Libro.
-    // OJO: Si la tabla de ejemplares muestra el Autor, descomenta la linea de abajo.
+    // ✅ OPTIMIZACIÓN CORREGIDA:
+    // Ahora hacemos FETCH también de los Autores, porque tu tabla del frontend los necesita.
     @Query("SELECT DISTINCT e FROM Ejemplar e " +
            "LEFT JOIN FETCH e.libro l " +
-           "LEFT JOIN FETCH l.autorLibros al " + // Descomenta si necesitas mostrar el autor en la tabla de ejemplares
-           "LEFT JOIN FETCH al.autor " + 
-           "ORDER BY e.idEjemplar DESC") // Ordenar para que se vea mejor
+           "LEFT JOIN FETCH l.autorLibros al " +  // <--- DESCOMENTADO
+           "LEFT JOIN FETCH al.autor " +          // <--- DESCOMENTADO
+           "ORDER BY e.idEjemplar DESC")
     List<Ejemplar> findAllWithDetails();
 
     Optional<Ejemplar> findFirstByLibroAndEstado(Libro libro, String estado);
