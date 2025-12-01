@@ -22,7 +22,7 @@ public class EjemplarController {
 
     @GetMapping
     public List<Ejemplar> getAll() {
-        return ejemplarRepository.findAll();
+        return ejemplarRepository.findAllWithDetails();
     }
 
     @GetMapping("/{id}")
