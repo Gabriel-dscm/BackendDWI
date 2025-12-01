@@ -3,32 +3,36 @@ package com.example.BibliotecaCeibos.Repository;
 import com.example.BibliotecaCeibos.Entity.Libro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-public interface LibroRepository extends JpaRepository<Libro,Integer>{
+@Repository
+public interface LibroRepository extends JpaRepository<Libro, Integer> {
 
-    @Query("SELECT l FROM Libro l LEFT JOIN FETCH l.dewey LEFT JOIN FETCH l.autorLibros al LEFT JOIN FETCH al.autor")
+    // ✅ CONSULTA MAESTRA: Trae Libro + Dewey + Autores + Palabras + Ejemplares en UN SOLO VIAJE
+    @Query("SELECT DISTINCT l FROM Libro l " +
+           "LEFT JOIN FETCH l.dewey " +
+           "LEFT JOIN FETCH l.autorLibros al " +
+           "LEFT JOIN FETCH al.autor " +
+           "LEFT JOIN FETCH l.libroPalabraClaves lpc " +
+           "LEFT JOIN FETCH lpc.palabraClave " +
+           "LEFT JOIN FETCH l.ejemplares")
     List<Libro> findAllWithDetails();
 
+    // ✅ BUSCADOR MAESTRO: Hace lo mismo pero filtrando
     @Query("SELECT DISTINCT l FROM Libro l " +
-            "LEFT JOIN FETCH l.dewey d " +
-            "LEFT JOIN FETCH l.autorLibros al LEFT JOIN FETCH al.autor a " +
-            "LEFT JOIN l.libroPalabraClaves lpc LEFT JOIN lpc.palabraClave pc " +
-            "LEFT JOIN l.ejemplares e " +
-            "WHERE (:titulo IS NULL OR l.titulo LIKE %:titulo%) " +
-            "AND (:autor IS NULL OR a.nombres LIKE %:autor% OR a.apellidos LIKE %:autor%) " +
-            "AND (:deweyId IS NULL OR d.idDewey = :deweyId) " +
-            "AND (:editorial IS NULL OR l.editorial LIKE %:editorial%) " +
-            "AND (:estado IS NULL OR e.estado = :estado)")
-    List<Libro> searchLibros(
-            @Param("titulo") String titulo,
-            @Param("autor") String autor,
-            @Param("deweyId") Integer deweyId,
-            @Param("editorial") String editorial,
-            @Param("estado") String estado
-    );
+           "LEFT JOIN FETCH l.dewey " +
+           "LEFT JOIN FETCH l.autorLibros al " +
+           "LEFT JOIN FETCH al.autor " +
+           "LEFT JOIN FETCH l.libroPalabraClaves lpc " +
+           "LEFT JOIN FETCH lpc.palabraClave " +
+           "WHERE (:titulo IS NULL OR l.titulo LIKE %:titulo%) " +
+           "AND (:autor IS NULL OR al.autor.nombres LIKE %:autor% OR al.autor.apellidos LIKE %:autor%) " +
+           "AND (:deweyId IS NULL OR l.dewey.idDewey = :deweyId) " +
+           "AND (:editorial IS NULL OR l.editorial LIKE %:editorial%) " +
+           "AND (:estado IS NULL OR EXISTS (SELECT e FROM l.ejemplares e WHERE e.estado = :estado))")
+    List<Libro> searchLibros(String titulo, String autor, Integer deweyId, String editorial, String estado);
 
-    @Query("SELECT DISTINCT l.editorial FROM Libro l WHERE l.editorial IS NOT NULL AND l.editorial != '' ORDER BY l.editorial ASC")
+    @Query("SELECT DISTINCT l.editorial FROM Libro l")
     List<String> findDistinctEditoriales();
 }
