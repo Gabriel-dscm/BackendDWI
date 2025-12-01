@@ -6,5 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface EjemplarRepository extends JpaRepository<Ejemplar,Integer>{
+    
+    @Query("SELECT e FROM Ejemplar e LEFT JOIN FETCH e.libro")
+    List<Ejemplar> findAllWithDetails();
+    
     Optional<Ejemplar> findFirstByLibroAndEstado(Libro libro, String estado);
 }
